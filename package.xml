@@ -3,7 +3,7 @@
 <package format="3">
   <name>alchemy</name>
   <version>1.0.0</version>
-  <description>ROS2 package for publishing all related info from biobox to /diagnostics<description>
+  <description>ROS2 package for publishing all related info from biobox to separate topics<description>
   <maintainer email="waseem.riaz.9999@gmail.com">waseemR02</maintainer>
   <license>MIT</license>
 

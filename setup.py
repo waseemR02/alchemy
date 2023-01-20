@@ -15,11 +15,12 @@ setup(
     zip_safe=True,
     maintainer='root',
     maintainer_email='waseem.riaz.9999@gmail.com',
-    description='ROS2 package for publishing all related info from biobox to /diagnostics',
+    description='ROS2 package for publishing all related info from bio to separate topics',
     license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'alchemy_node = alchemy.alchemy_node:main',
         ],
     },
 )
