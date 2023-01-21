@@ -155,13 +155,15 @@ class Alchemy(Node):
         Publish all the gas data to Gases topic
         """
         msg = GroupData()
-        msg.components[0].key = "Ammonia"
-        msg.components[1].key = "Methane"
-        msg.components[2].key = "CO2"
+        fields = [("Ammonia", str(self.BIO_INFO[0]) + " ppm",
+                     "Methane", str(self.BIO_INFO[1]) + " ppm",
+                     "CO2", str(self.BIO_INFO[7]) + " ppm")]            
 
-        msg.components[0].value = str(self.BIO_INFO[0]) + " ppm"
-        msg.components[1].value = str(self.BIO_INFO[1]) + " ppm"
-        msg.components[2].value = str(self.BIO_INFO[7]) + " ppm"
+        
+        msg.components = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.components, fields):
+            kv.key = f[0]
+            kv.value = f[1]
 
         self.gas_pub.publish(msg)
 
@@ -170,11 +172,13 @@ class Alchemy(Node):
         Publish all the temperature data to Temperatures topic
         """
         msg = GroupData()
-        msg.components[0].key = "Subsurface_temp"
-        msg.components[1].key = "Atmosphere_temp"
-
-        msg.components[0].value = str(self.BIO_INFO[2]) + " C"
-        msg.components[1].value = str(self.BIO_INFO[3]) + " C"
+        fields = [("Subsurface_temp", str(self.BIO_INFO[2]) + " C",
+                     "Atmosphere_temp", str(self.BIO_INFO[3]) + " C")]
+        
+        msg.components = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.components, fields):
+            kv.key = f[0]
+            kv.value = f[1]
 
         self.temp_pub.publish(msg)
 
@@ -183,13 +187,14 @@ class Alchemy(Node):
         Publish all the miscellaneous data to Miscellaneous topic
         """
         msg = GroupData()
-        msg.components[0].key = "Humidity"
-        msg.components[1].key = "Atmospheric_pressure"
-        msg.components[2].key = "Moisture"
-
-        msg.components[0].value = str(self.BIO_INFO[4]) + " %"
-        msg.components[1].value = str(self.BIO_INFO[5]) + " Pa"
-        msg.components[2].value = str(self.BIO_INFO[6]) + " %"
+        fields = [("Humidity", str(self.BIO_INFO[4]) + " %",
+                     "Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa",
+                     "Moisture", str(self.BIO_INFO[6]) + " %")]
+        
+        msg.components = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.components, fields):
+            kv.key = f[0]
+            kv.value = f[1]
 
         self.misc_pub.publish(msg)
 
