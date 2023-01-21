@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from diagnostic_msgs.msg import KeyValue
 
-from alchemy_msgs.msg import Alchemy
+from alchemy_msgs.msg import GroupData
 
 import serial
 
@@ -29,12 +29,12 @@ class Alchemy(Node):
         self.co2_pub = self.create_publisher(KeyValue, 'CO2', 10)
         
         #Create publisher for publishing data group wise
-        self.gas_pub = self.create_publisher(Alchemy, 'Gases', 10)
-        self.temp_pub = self.create_publisher(Alchemy, 'Temperatures', 10)
-        self.misc_pub = self.create_publisher(Alchemy, 'Miscellaneous', 10)
+        self.gas_pub = self.create_publisher(GroupData, 'Gases', 10)
+        self.temp_pub = self.create_publisher(GroupData, 'Temperatures', 10)
+        self.misc_pub = self.create_publisher(GroupData, 'Miscellaneous', 10)
 
         # Prepare serial port for reading Bio information
-        self.prepare_serial("/dev/ttyUSB1", baudrate=115200)
+        self.prepare_serial("/dev/ttyUSB0", baudrate=115200)
 
         # Set default values for Bio information
         self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -154,7 +154,7 @@ class Alchemy(Node):
         """
         Publish all the gas data to Gases topic
         """
-        msg = Alchemy()
+        msg = GroupData()
         msg.components[0].key = "Ammonia"
         msg.components[1].key = "Methane"
         msg.components[2].key = "CO2"
@@ -169,7 +169,7 @@ class Alchemy(Node):
         """
         Publish all the temperature data to Temperatures topic
         """
-        msg = Alchemy()
+        msg = GroupData()
         msg.components[0].key = "Subsurface_temp"
         msg.components[1].key = "Atmosphere_temp"
 
@@ -182,7 +182,7 @@ class Alchemy(Node):
         """
         Publish all the miscellaneous data to Miscellaneous topic
         """
-        msg = Alchemy()
+        msg = GroupData()
         msg.components[0].key = "Humidity"
         msg.components[1].key = "Atmospheric_pressure"
         msg.components[2].key = "Moisture"
