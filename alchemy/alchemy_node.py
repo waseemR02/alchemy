@@ -159,10 +159,11 @@ class Alchemy(Node):
                      ("CO2", str(self.BIO_INFO[7]) + " ppm")]            
 
         
-        msg.values = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.values, fields):
-            kv.key = f[0]
-            kv.value = f[1]
+        msg.values = []
+        for i in range(len(fields)):
+            msg.values.append(KeyValue())
+            msg.values[i].key = fields[i][0]
+            msg.values[i].value = fields[i][1]
         
         self.gas_pub.publish(msg)
 
@@ -174,11 +175,12 @@ class Alchemy(Node):
         fields = [("Subsurface_temp", str(self.BIO_INFO[2]) + " C"),
                      ("Atmosphere_temp", str(self.BIO_INFO[3]) + " C")]
         
-        msg.values = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.values, fields):
-            kv.key = f[0]
-            kv.value = f[1]
-
+        msg.values = []
+        for i in range(len(fields)):
+            msg.values.append(KeyValue())
+            msg.values[i].key = fields[i][0]
+            msg.values[i].value = fields[i][1]
+        
         self.temp_pub.publish(msg)
 
     def publish_misc_data(self):
@@ -190,10 +192,11 @@ class Alchemy(Node):
                      ("Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa"),
                      ("Moisture", str(self.BIO_INFO[6]) + " %")]
         
-        msg.values = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.values, fields):
-            kv.key = f[0]
-            kv.value = f[1]
+        msg.values = []
+        for i in range(len(fields)):
+            msg.values.append(KeyValue())
+            msg.values[i].key = fields[i][0]
+            msg.values[i].value = fields[i][1]
 
         self.misc_pub.publish(msg)
 
