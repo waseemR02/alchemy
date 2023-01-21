@@ -1,8 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from diagnostic_msgs.msg import KeyValue
-
-from alchemy_msgs.msg import GroupData
+from diagnostic_msgs.msg import DiagnosticStatus
 
 import serial
 
@@ -29,9 +28,9 @@ class Alchemy(Node):
         self.co2_pub = self.create_publisher(KeyValue, 'CO2', 10)
         
         #Create publisher for publishing data group wise
-        self.gas_pub = self.create_publisher(GroupData, 'Gases', 10)
-        self.temp_pub = self.create_publisher(GroupData, 'Temperatures', 10)
-        self.misc_pub = self.create_publisher(GroupData, 'Miscellaneous', 10)
+        self.gas_pub = self.create_publisher(DiagnosticStatus, 'Gases', 10)
+        self.temp_pub = self.create_publisher(DiagnosticStatus, 'Temperatures', 10)
+        self.misc_pub = self.create_publisher(DiagnosticStatus, 'Miscellaneous', 10)
 
         # Prepare serial port for reading Bio information
         self.prepare_serial("/dev/ttyUSB0", baudrate=115200)
@@ -154,29 +153,29 @@ class Alchemy(Node):
         """
         Publish all the gas data to Gases topic
         """
-        msg = GroupData()
-        fields = [("Ammonia", str(self.BIO_INFO[0]) + " ppm",
-                     "Methane", str(self.BIO_INFO[1]) + " ppm",
-                     "CO2", str(self.BIO_INFO[7]) + " ppm")]            
+        msg = DiagnosticStatus()
+        fields = [("Ammonia", str(self.BIO_INFO[0]) + " ppm"),
+                     ("Methane", str(self.BIO_INFO[1]) + " ppm"),
+                     ("CO2", str(self.BIO_INFO[7]) + " ppm")]            
 
         
-        msg.components = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.components, fields):
+        msg.values = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.values, fields):
             kv.key = f[0]
             kv.value = f[1]
-
+        breakpoint()
         self.gas_pub.publish(msg)
 
     def publish_temp_data(self):
         """
         Publish all the temperature data to Temperatures topic
         """
-        msg = GroupData()
-        fields = [("Subsurface_temp", str(self.BIO_INFO[2]) + " C",
-                     "Atmosphere_temp", str(self.BIO_INFO[3]) + " C")]
+        msg = DiagnosticStatus()
+        fields = [("Subsurface_temp", str(self.BIO_INFO[2]) + " C"),
+                     ("Atmosphere_temp", str(self.BIO_INFO[3]) + " C")]
         
-        msg.components = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.components, fields):
+        msg.values = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.values, fields):
             kv.key = f[0]
             kv.value = f[1]
 
@@ -186,13 +185,13 @@ class Alchemy(Node):
         """
         Publish all the miscellaneous data to Miscellaneous topic
         """
-        msg = GroupData()
-        fields = [("Humidity", str(self.BIO_INFO[4]) + " %",
-                     "Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa",
-                     "Moisture", str(self.BIO_INFO[6]) + " %")]
+        msg = DiagnosticStatus()
+        fields = [("Humidity", str(self.BIO_INFO[4]) + " %"),
+                     ("Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa"),
+                     ("Moisture", str(self.BIO_INFO[6]) + " %")]
         
-        msg.components = [KeyValue()]*len(fields)
-        for kv, f in zip(msg.components, fields):
+        msg.values = [KeyValue()]*len(fields)
+        for kv, f in zip(msg.values, fields):
             kv.key = f[0]
             kv.value = f[1]
 
