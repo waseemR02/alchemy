@@ -2,6 +2,8 @@ import rclpy
 from rclpy.node import Node
 from diagnostic_msgs.msg import KeyValue
 
+from alchemy_msgs.msg import Alchemy
+
 import serial
 
 
@@ -25,6 +27,11 @@ class Alchemy(Node):
             KeyValue, 'Atmospheric_pressure', 10)
         self.moisture_pub = self.create_publisher(KeyValue, 'Moisture', 10)
         self.co2_pub = self.create_publisher(KeyValue, 'CO2', 10)
+        
+        #Create publisher for publishing data group wise
+        self.gas_pub = self.create_publisher(Alchemy, 'Gases', 10)
+        self.temp_pub = self.create_publisher(Alchemy, 'Temperatures', 10)
+        self.misc_pub = self.create_publisher(Alchemy, 'Miscellaneous', 10)
 
         # Prepare serial port for reading Bio information
         self.prepare_serial("/dev/ttyUSB1", baudrate=115200)
@@ -67,7 +74,9 @@ class Alchemy(Node):
         self.publish_atmospheric_pressure()
         self.publish_moisture()
         self.publish_co2()
-
+        self.publish_gas_data()
+        self.publish_temp_data()
+        self.publish_misc_data()
 
     def publish_ammonia(self):
         """
@@ -141,6 +150,49 @@ class Alchemy(Node):
         msg.value = str(self.BIO_INFO[7])
         self.co2_pub.publish(msg)
     
+    def publish_gas_data(self):
+        """
+        Publish all the gas data to Gases topic
+        """
+        msg = Alchemy()
+        msg.components[0].key = "Ammonia"
+        msg.components[1].key = "Methane"
+        msg.components[2].key = "CO2"
+
+        msg.components[0].value = str(self.BIO_INFO[0]) + " ppm"
+        msg.components[1].value = str(self.BIO_INFO[1]) + " ppm"
+        msg.components[2].value = str(self.BIO_INFO[7]) + " ppm"
+
+        self.gas_pub.publish(msg)
+
+    def publish_temp_data(self):
+        """
+        Publish all the temperature data to Temperatures topic
+        """
+        msg = Alchemy()
+        msg.components[0].key = "Subsurface_temp"
+        msg.components[1].key = "Atmosphere_temp"
+
+        msg.components[0].value = str(self.BIO_INFO[2]) + " C"
+        msg.components[1].value = str(self.BIO_INFO[3]) + " C"
+
+        self.temp_pub.publish(msg)
+
+    def publish_misc_data(self):
+        """
+        Publish all the miscellaneous data to Miscellaneous topic
+        """
+        msg = Alchemy()
+        msg.components[0].key = "Humidity"
+        msg.components[1].key = "Atmospheric_pressure"
+        msg.components[2].key = "Moisture"
+
+        msg.components[0].value = str(self.BIO_INFO[4]) + " %"
+        msg.components[1].value = str(self.BIO_INFO[5]) + " Pa"
+        msg.components[2].value = str(self.BIO_INFO[6]) + " %"
+
+        self.misc_pub.publish(msg)
+
 def main(args=None):
 
     rclpy.init(args=args)
