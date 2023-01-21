@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from diagnostic_msgs.msg import key_value
+from diagnostic_msgs.msg import KeyValue
 
 import serial
 
@@ -14,20 +14,20 @@ class Alchemy(Node):
         super().__init__('alchemy_node')
 
         # Create 8 separate publishers with topic names Ammonia, Methane, Subsurface_temp, Atmosphere_temp, Humidity, Atmospheric_pressure, Moisture and CO2
-        self.ammonia_pub = self.create_publisher(key_value, 'Ammonia', 10)
-        self.methane_pub = self.create_publisher(key_value, 'Methane', 10)
+        self.ammonia_pub = self.create_publisher(KeyValue, 'Ammonia', 10)
+        self.methane_pub = self.create_publisher(KeyValue, 'Methane', 10)
         self.subsurface_temp_pub = self.create_publisher(
-            key_value, 'Subsurface_temp', 10)
+            KeyValue, 'Subsurface_temp', 10)
         self.atmosphere_temp_pub = self.create_publisher(
-            key_value, 'Atmosphere_temp', 10)
-        self.humidity_pub = self.create_publisher(key_value, 'Humidity', 10)
+            KeyValue, 'Atmosphere_temp', 10)
+        self.humidity_pub = self.create_publisher(KeyValue, 'Humidity', 10)
         self.atmospheric_pressure_pub = self.create_publisher(
-            key_value, 'Atmospheric_pressure', 10)
-        self.moisture_pub = self.create_publisher(key_value, 'Moisture', 10)
-        self.co2_pub = self.create_publisher(key_value, 'CO2', 10)
+            KeyValue, 'Atmospheric_pressure', 10)
+        self.moisture_pub = self.create_publisher(KeyValue, 'Moisture', 10)
+        self.co2_pub = self.create_publisher(KeyValue, 'CO2', 10)
 
         # Prepare serial port for reading Bio information
-        self.prepare_serial("/dev/ttyUSB0", baudrate=115200)
+        self.prepare_serial("/dev/ttyUSB1", baudrate=115200)
 
         # Set default values for Bio information
         self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -53,7 +53,7 @@ class Alchemy(Node):
         """
         Parse the message received from serial port and updates the BIO_INFO
         """
-        self.BIO_INFO = self.ser.readline.split(",")
+        self.BIO_INFO = self.ser.readline().decode().split(",")
 
     def publish_bio_info(self):
         """
@@ -73,72 +73,72 @@ class Alchemy(Node):
         """
         Publish Ammonia data to Ammonia topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Ammonia"
-        msg.value = self.BIO_INFO[0]
+        msg.value = str(self.BIO_INFO[0])
         self.ammonia_pub.publish(msg)
 
     def publish_methane(self):
         """
         Publish Methane data to Methane topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Methane"
-        msg.value = self.BIO_INFO[1]
+        msg.value = str(self.BIO_INFO[1])
         self.methane_pub.publish(msg)
 
     def publish_subsurface_temp(self):
         """
         Publish Subsurface_temp data to Subsurface_temp topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Subsurface_temp"
-        msg.value = self.BIO_INFO[2]
+        msg.value = str(self.BIO_INFO[2])
         self.subsurface_temp_pub.publish(msg)
 
     def publish_atmosphere_temp(self):
         """
         Publish Atmosphere_temp data to Atmosphere_temp topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Atmosphere_temp"
-        msg.value = self.BIO_INFO[3]
+        msg.value = str(self.BIO_INFO[3])
         self.atmosphere_temp_pub.publish(msg)
 
     def publish_humidity(self):
         """
         Publish Humidity data to Humidity topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Humidity"
-        msg.value = self.BIO_INFO[4]
+        msg.value = str(self.BIO_INFO[4])
         self.humidity_pub.publish(msg)
 
     def publish_atmospheric_pressure(self):
         """
         Publish Atmospheric_pressure data to Atmospheric_pressure topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Atmospheric_pressure"
-        msg.value = self.BIO_INFO[5]
+        msg.value = str(self.BIO_INFO[5])
         self.atmospheric_pressure_pub.publish(msg)
 
     def publish_moisture(self):
         """
         Publish Moisture data to Moisture topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "Moisture"
-        msg.value = self.BIO_INFO[6]
+        msg.value = str(self.BIO_INFO[6])
         self.moisture_pub.publish(msg)
     
     def publish_co2(self):
         """
         Publish CO2 data to CO2 topic
         """
-        msg = key_value()
+        msg = KeyValue()
         msg.key = "CO2"
-        msg.value = self.BIO_INFO[7]
+        msg.value = str(self.BIO_INFO[7])
         self.co2_pub.publish(msg)
     
 def main(args=None):
@@ -154,4 +154,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-    
