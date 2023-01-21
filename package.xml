@@ -3,7 +3,7 @@
 <package format="3">
   <name>alchemy</name>
   <version>1.0.0</version>
-  <description>ROS2 package for publishing all related info from biobox to separate topics<description>
+  <description>ROS2 package for publishing all related info from biobox to relevant topics</description>
   <maintainer email="waseem.riaz.9999@gmail.com">waseemR02</maintainer>
   <license>MIT</license>
 
@@ -11,6 +11,7 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
+  <exec_depend>rclpy</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
