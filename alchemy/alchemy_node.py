@@ -163,7 +163,7 @@ class Alchemy(Node):
         for kv, f in zip(msg.values, fields):
             kv.key = f[0]
             kv.value = f[1]
-        breakpoint()
+        
         self.gas_pub.publish(msg)
 
     def publish_temp_data(self):
