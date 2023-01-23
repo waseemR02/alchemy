@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'pyserial', 'numpy'],
     zip_safe=True,
     maintainer='root',
     maintainer_email='waseem.riaz.9999@gmail.com',
@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'alchemy_node = alchemy.alchemy_node:main',
+            'pseudo_node = alchemy.pseudo_node:main'
         ],
     },
 )
