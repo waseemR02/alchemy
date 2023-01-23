@@ -32,6 +32,11 @@ class PseudoAlchemy(Node):
         # Set default values for Bio information
         self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0]
 
+        #Create publisher for publishing data group wise
+        self.gas_pub = self.create_publisher(DiagnosticStatus, 'Gases', 10)
+        self.temp_pub = self.create_publisher(DiagnosticStatus, 'Temperatures', 10)
+        self.misc_pub = self.create_publisher(DiagnosticStatus, 'Miscellaneous', 10)
+
         # Create timer to publish Bio information every 1 second
         self.timer = self.create_timer(1, self.publish_bio_info)
 
