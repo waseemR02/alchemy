@@ -67,7 +67,7 @@ class PseudoAlchemy(Node):
         Generate noisy data over mean value and take mean of the list of data
         according to normal gaussian distribution
         """
-        list_data = numpy.random.normal(mean, std_deviation,1000)
+        list_data = numpy.random.normal(mean, std_deviation,10000)
         return numpy.mean(list_data)
 
     def publish_bio_info(self):
@@ -120,9 +120,9 @@ class PseudoAlchemy(Node):
         msg = KeyValue()
         msg.key = "Atmosphere_temp"
 
-        data = self.__make_noisy_data_over_mean(27, 1.5)
+        self.data_atmos_temp = self.__make_noisy_data_over_mean(27, 1.5)
 
-        msg.value = str(data)
+        msg.value = str(self.data_atmos_temp)
         self.atmosphere_temp_pub.publish(msg)
 
     def publish_humidity(self):
@@ -141,9 +141,9 @@ class PseudoAlchemy(Node):
         msg = KeyValue()
         msg.key = "Atmospheric_pressure"
 
-        data = self.__make_noisy_data_over_mean(1000, 100)
+        self.data_atmos_pressure = self.__make_noisy_data_over_mean(1000, 100)
 
-        msg.value = str(data)
+        msg.value = str(self.data_atmos_pressure)
         self.atmospheric_pressure_pub.publish(msg)
 
     def publish_moisture(self):
@@ -186,8 +186,9 @@ class PseudoAlchemy(Node):
         Publish all the temperature data to Temperatures topic
         """
         msg = DiagnosticStatus()
+
         fields = [("Subsurface_temp", str(self.BIO_INFO[2]) + " C"),
-                  ("Atmosphere_temp", str(self.BIO_INFO[3]) + " C")]
+                  ("Atmosphere_temp", str(self.data_atmos_temp) + " C")]
 
         msg.values = []
         for i in range(len(fields)):
@@ -203,7 +204,7 @@ class PseudoAlchemy(Node):
         """
         msg = DiagnosticStatus()
         fields = [("Humidity", str(self.BIO_INFO[4]) + " %"),
-                  ("Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa"),
+                  ("Atmospheric_pressure", str(self.data_atmos_pressure) + " Pa"),
                   ("Moisture", str(self.BIO_INFO[6]) + " %")]
 
         msg.values = []
