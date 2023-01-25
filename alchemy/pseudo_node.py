@@ -52,7 +52,7 @@ class PseudoAlchemy(Node):
         #  subsurface_temp = (30,10), atmosphere_temp = (30,10), humidity = (50,10), 
         # atmospheric_pressure = (1000,100), moisture = (50,10), co2 = (400,100)
         list_mean_deviation = [(2.5, 2.5), (1, 1), (30, 10),
-                               (30, 10), (50, 10), (1000, 100), (50, 10), (400, 100)]
+                               (27, 1.5), (65, 7.8), (1000, 100), (18.45, 5.2), (400, 100)]
         
         self.BIO_INFO = list(starmap(self.__make_noisy_data, list_mean_deviation))
 
