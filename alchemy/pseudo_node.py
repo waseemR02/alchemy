@@ -62,6 +62,14 @@ class PseudoAlchemy(Node):
         """
         return numpy.random.normal(mean, std_deviation)
 
+    def __make_noisy_data_over_mean(self, mean, std_deviation):
+        """
+        Generate noisy data over mean value and take mean of the list of data
+        according to normal gaussian distribution
+        """
+        list_data = numpy.random.normal(mean, std_deviation,1000)
+        return numpy.mean(list_data)
+
     def publish_bio_info(self):
         """
         Publish Bio information to all the topics
@@ -111,7 +119,10 @@ class PseudoAlchemy(Node):
         """
         msg = KeyValue()
         msg.key = "Atmosphere_temp"
-        msg.value = str(self.BIO_INFO[3])
+
+        data = self.__make_noisy_data_over_mean(27, 1.5)
+
+        msg.value = str(data)
         self.atmosphere_temp_pub.publish(msg)
 
     def publish_humidity(self):
@@ -129,7 +140,10 @@ class PseudoAlchemy(Node):
         """
         msg = KeyValue()
         msg.key = "Atmospheric_pressure"
-        msg.value = str(self.BIO_INFO[5])
+
+        data = self.__make_noisy_data_over_mean(1000, 100)
+
+        msg.value = str(data)
         self.atmospheric_pressure_pub.publish(msg)
 
     def publish_moisture(self):
