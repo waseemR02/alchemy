@@ -4,6 +4,10 @@ from diagnostic_msgs.msg import KeyValue
 from diagnostic_msgs.msg import DiagnosticStatus
 
 import serial
+import json
+import socket
+
+SOCKET_ADDRESS = "/tmp/hardware.sock"
 
 
 class Alchemy(Node):
@@ -14,7 +18,8 @@ class Alchemy(Node):
     def __init__(self):
         super().__init__('alchemy_node')
 
-        # Create 8 separate publishers with topic names Ammonia, Methane, Subsurface_temp, Atmosphere_temp, Humidity, Atmospheric_pressure, Moisture and CO2
+        # Create 9 separate publishers with topic names Ammonia, Methane, Subsurface_temp, Atmosphere_temp, Humidity, Atmospheric_pressure, 
+        # Moisture, CO2 and ph readings respectively
         self.ammonia_pub = self.create_publisher(KeyValue, 'Ammonia', 10)
         self.methane_pub = self.create_publisher(KeyValue, 'Methane', 10)
         self.subsurface_temp_pub = self.create_publisher(
@@ -26,17 +31,19 @@ class Alchemy(Node):
             KeyValue, 'Atmospheric_pressure', 10)
         self.moisture_pub = self.create_publisher(KeyValue, 'Moisture', 10)
         self.co2_pub = self.create_publisher(KeyValue, 'CO2', 10)
+        self.ph_pub = self.create_publisher(KeyValue, 'ph', 10)
         
         #Create publisher for publishing data group wise
         self.gas_pub = self.create_publisher(DiagnosticStatus, 'Gases', 10)
         self.temp_pub = self.create_publisher(DiagnosticStatus, 'Temperatures', 10)
         self.misc_pub = self.create_publisher(DiagnosticStatus, 'Miscellaneous', 10)
 
-        # Prepare serial port for reading Bio information
+        # Prepare serial port and socket for reading Bio information
         self.prepare_serial("/dev/ttyUSB0", baudrate=115200)
+        self.hardware_socket = self.prepare_socket(SOCKET_ADDRESS)
 
         # Set default values for Bio information
-        self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         # Create timer to publish Bio information every 1 second
         self.timer = self.create_timer(1, self.publish_bio_info)
@@ -55,11 +62,28 @@ class Alchemy(Node):
         except Exception as e:
             self.get_logger().info("Error opening serial port: {}".format(e))
 
+    def prepare_socket(self, addr):
+        """
+        Connect to UNIX socket on addr for reading Bio information and return the socket
+        """
+        try:
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.connect(addr)
+            self.get_logger().info("Socket opened successfully")
+            return sock
+        except Exception as e:
+            self.get_logger().info("Error opening socket: {}".format(e))
+
     def get_bio_info(self):
         """
         Parse the message received from serial port and updates the BIO_INFO
         """
         self.BIO_INFO = self.ser.readline().decode().split(",")
+        
+        # Request for Bio information from socket
+        self.hardware_socket.sendall(json.dumps("SensorRead"))
+        data = self.hardware_socket.recv(32)
+        self.BIO_INFO[8] = int(data.decode())
 
     def publish_bio_info(self):
         """
@@ -148,6 +172,15 @@ class Alchemy(Node):
         msg.key = "CO2"
         msg.value = str(self.BIO_INFO[7])
         self.co2_pub.publish(msg)
+
+    def publish_ph(self):
+        """
+        Publish PH data to PH topic
+        """
+        msg = KeyValue()
+        msg.key = "PH"
+        msg.value = str(self.BIO_INFO[8])
+        self.ph_pub.publish(msg)
     
     def publish_gas_data(self):
         """
@@ -190,7 +223,8 @@ class Alchemy(Node):
         msg = DiagnosticStatus()
         fields = [("Humidity", str(self.BIO_INFO[4]) + " %"),
                      ("Atmospheric_pressure", str(self.BIO_INFO[5]) + " Pa"),
-                     ("Moisture", str(self.BIO_INFO[6]) + " %")]
+                     ("Moisture", str(self.BIO_INFO[6]) + " %"),
+                     ("PH", str(self.BIO_INFO[8]) + " ")]
         
         msg.values = []
         for i in range(len(fields)):
