@@ -40,7 +40,7 @@ class Alchemy(Node):
 
         # Prepare serial port and socket for reading Bio information
         self.prepare_serial("/dev/ttyUSB0", baudrate=115200)
-        self.hardware_socket = self.prepare_socket(SOCKET_ADDRESS)
+        self.prepare_socket(SOCKET_ADDRESS)
 
         # Set default values for Bio information
         self.BIO_INFO = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -64,13 +64,12 @@ class Alchemy(Node):
 
     def prepare_socket(self, addr):
         """
-        Connect to UNIX socket on addr for reading Bio information and return the socket
+        Connect to UNIX socket on addr for reading Bio information
         """
         try:
-            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.connect(addr)
+            self.hardware_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            self.hardware_socket.connect(addr)
             self.get_logger().info("Socket opened successfully")
-            return sock
         except Exception as e:
             self.get_logger().info("Error opening socket: {}".format(e))
 
@@ -79,11 +78,11 @@ class Alchemy(Node):
         Parse the message received from serial port and updates the BIO_INFO
         """
         self.BIO_INFO = self.ser.readline().decode().split(",")
-        
+
         # Request for Bio information from socket
         self.hardware_socket.sendall(json.dumps("SensorRead"))
         data = self.hardware_socket.recv(32)
-        self.BIO_INFO[8] = int(data.decode())
+        self.BIO_INFO[8] = int(data.decode())/100
 
     def publish_bio_info(self):
         """
@@ -97,6 +96,7 @@ class Alchemy(Node):
         self.publish_atmospheric_pressure()
         self.publish_moisture()
         self.publish_co2()
+        self.publish_ph()
         self.publish_gas_data()
         self.publish_temp_data()
         self.publish_misc_data()
